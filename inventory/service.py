@@ -2,6 +2,7 @@ import json
 import logging
 import boto3
 import uuid
+import traceback
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch
 
@@ -31,7 +32,8 @@ def make_response(response_code=200, payload=None):
             "x-custom-header": "my custom header value",
             'Content-Type': 'application/json'
         },
-        "body": json.dumps(payload or {})
+        # "body": json.dumps(payload or {})
+        "body": payload or {}
     }
 
 
@@ -39,14 +41,14 @@ def make_response(response_code=200, payload=None):
 def handle_reservation(message):
     required_fields = set(['product_id', 'qty'])
     validate(message, required_fields)
-    return make_response(200, {'reservation_id': uuid.uuid4()})
+    return make_response(200, {'reservation_id': str(uuid.uuid4())})
 
 
 @xray_recorder.capture('handle_pickup')
 def handle_pickup(message):
     required_fields = set(['reservation_id'])
     validate(message, required_fields)
-    return make_response(200, {'reservation_id': uuid.uuid4()})
+    return make_response(200, {'reservation_id': str(uuid.uuid4())})
 
 
 def handle_request(event, context):
@@ -57,8 +59,9 @@ def handle_request(event, context):
     try:
         init_logger()
         print(f'event --> {event}')
-        message = json.loads(event.get('body'))
-        return_message = operations.get(message.get_body('operation'))(message)
+        if isinstance(event, str):
+            event = json.loads(event)
+        return_message = operations.get(event.get('operation'))(event)
         return_message.get('headers')['x-inventory-version'] = context.function_version
         return return_message
     except Exception as ex:

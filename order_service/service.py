@@ -32,6 +32,7 @@ def make_response(response_code=200, payload=None):
         "body": json.dumps(payload or {})
     }
 
+
 @xray_recorder.capture('validate')
 def validate(message):
     fields = [f for f in message if not f.startswith('_')]
@@ -55,24 +56,24 @@ def reserve(request, stage):
 @xray_recorder.capture('payment')
 def payment(request, stage):
     payment_response = lambda_client.invoke(FunctionName=f'{payment_service_name}:{stage}',
-                                                InvocationType='RequestResponse',
-                                                LogType='Tail',
-                                                Payload=json.dumps({
-                                                    'operation': 'reservation',
-                                                    'product_id': request.get('product_id'),
-                                                    'qty': request.get('qty')
-                                                }))
+                                            InvocationType='RequestResponse',
+                                            LogType='Tail',
+                                            Payload=json.dumps({
+                                                'operation': 'reservation',
+                                                'product_id': request.get('product_id'),
+                                                'qty': request.get('qty')
+                                            }))
     return payment_response
 
 
 @xray_recorder.capture('shipment')
-def payment(reservation_id, stage):
+def ship_it(request, stage):
     lambda_client.invoke(FunctionName=f'{shipping_service_name}:{stage}',
-                                                InvocationType='Event',
-                                                LogType='Tail',
-                                                Payload=json.dumps({
-                                                    'reservation_id': reservation_id
-                                                }))
+                         InvocationType='Event',
+                         LogType='Tail',
+                         Payload=json.dumps({
+                             request
+                         }))
 
 
 def handle_request(event, context):
@@ -84,19 +85,40 @@ def handle_request(event, context):
         reservation_response = reserve(request, stage)
         print(f'-  reservation response -> ${reservation_response}')
         rsp = json.loads(reservation_response['Payload'].read())
-        print(rsp)
-        # return json.loads(response["Payload"].read())
-        reservation_code = rsp.get('status_code')
+        print(f' - rsp [type{type(rsp)}] -> {rsp}')
+
+        reservation_code = rsp.get('statusCode')
         if reservation_code > 299:
             return make_response(reservation_code, rsp.get('body'))
-        else:
-            return {
-                "statusCode": 200,
-                "headers": {
-                    "x-stage": stage
-                },
-                "body": json.dumps({"result": "OK"})
-            }
+
+        reservation_id = rsp.get('body').get('reservation_id')
+        pmt_rsp = payment({'reservation_id': reservation_id,
+                           'amount': request.get('amount'),
+                           'currency': request.get('currency'),
+                           'payment_id': request.get('payment_id'),
+                           'payment_secret': request.get('payment_secret')
+                           }, stage)
+
+        rsp = json.load(pmt_rsp['Payload'].read())
+        print(f'payload rsp => {rsp}')
+        if rsp.get('statusCode') > 299:
+            return make_response(rsp.get('statusCode'), rsp.get('body'))
+
+        shipping_response = ship_it({'reservation_id': reservation_id}, stage)
+        rsp = json.load(shipping_response['Payload'].read())
+        if rsp.get('statusCode') > 299:
+            return make_response(rsp.get('statusCode'), rsp.get('body'))
+        print(f'shipping rsp => {rsp}')
+        return {
+            "statusCode": 200,
+            "headers": {
+                "x-stage": stage
+            },
+            "body": json.dumps({
+                "result": "OK",
+                "reservation_id": reservation_id
+            })
+        }
     except Exception as ex:
         err_msg = str(ex)
         logger.error(f'{ex.__class__.__name__}: {err_msg}')

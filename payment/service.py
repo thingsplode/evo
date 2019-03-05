@@ -2,6 +2,7 @@ import json
 import logging
 import boto3
 import uuid
+import traceback
 
 from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch
@@ -30,19 +31,18 @@ def make_response(response_code=200, payload=None):
             "headers": {
                 "x-custom-header": "my custom header value"
             },
-            "body": json.dumps(payload or {})
+            # "body": json.dumps(payload or {})
+            "body": payload or {}
         }
 
 
 def handle_request(event, context):
     try:
         init_logger()
-        validate(event.get('body'))
-        return make_response(200, {'payment_id': uuid.uuid4()})
+        validate(event)
+        return make_response(200, {'payment_id': str(uuid.uuid4())})
     except Exception as ex:
         err_msg = str(ex)
         logger.error(f'generic exception: {err_msg}')
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"result": f'{ex.__class__.__name__}: {err_msg}'})
-        }
+        traceback.print_exc()
+        return make_response(500, {"result": f'{ex.__class__.__name__}: {err_msg}'})
