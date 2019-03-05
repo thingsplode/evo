@@ -21,7 +21,7 @@ def init_logger():
 
 @xray_recorder.capture('validate')
 def validate(message):
-    fields = [f for f in message.__dict__ if not f.startswith('_')]
+    fields = [f for f in message if not f.startswith('_')]
     assert len(required_fields.intersection(fields)) >= len(
         required_fields), 'Validation failed: some fields are missing.'
 
@@ -35,5 +35,5 @@ def handle_request(event, context):
         logger.error(f'generic exception: {err_msg}')
         return {
             "statusCode": 500,
-            "body": json.dumps({"result": f'{ex.__class__.__name__}: {err_msg}'})
+            "body": json.dumps({"result@shipping": f'{ex.__class__.__name__}: {err_msg}'})
         }

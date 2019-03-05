@@ -9,11 +9,13 @@ from aws_xray_sdk.core import patch
 patch(['boto3'])
 
 lambda_client = boto3.client('lambda')
+function_name = None
 
 
 def init_logger():
     global logger
     logger = logging.getLogger()
+    logging.getLogger('aws_xray_sdk').setLevel(logging.WARNING)
     logger.setLevel(logging.INFO)
 
 
@@ -29,7 +31,7 @@ def make_response(response_code=200, payload=None):
     return {
         "statusCode": response_code,
         "headers": {
-            "x-custom-header": "my custom header value",
+            "x-source": function_name,
             'Content-Type': 'application/json'
         },
         # "body": json.dumps(payload or {})
@@ -58,7 +60,9 @@ def handle_request(event, context):
     }
     try:
         init_logger()
-        print(f'event --> {event}')
+        global function_name
+        function_name = context.function_name
+        logger.debug(f'event --> {event}')
         if isinstance(event, str):
             event = json.loads(event)
         return_message = operations.get(event.get('operation'))(event)
@@ -68,4 +72,4 @@ def handle_request(event, context):
         err_msg = str(ex)
         traceback.print_exc()
         logger.error(f'{ex.__class__.__name__}: {err_msg}')
-        return make_response(500, {"result": f'{ex.__class__.__name__}: {err_msg}'})
+        return make_response(500, {"result@inventory": f'{ex.__class__.__name__}: {err_msg}'})

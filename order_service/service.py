@@ -18,6 +18,7 @@ required_fields = set(['product_id', 'qty', 'amount', 'currency', 'payment_metho
 def init_logger():
     global logger
     logger = logging.getLogger()
+    logging.getLogger('aws_xray_sdk').setLevel(logging.WARNING)
     logger.setLevel(logging.INFO)
 
 
@@ -58,11 +59,7 @@ def payment(request, stage):
     payment_response = lambda_client.invoke(FunctionName=f'{payment_service_name}:{stage}',
                                             InvocationType='RequestResponse',
                                             LogType='Tail',
-                                            Payload=json.dumps({
-                                                'operation': 'reservation',
-                                                'product_id': request.get('product_id'),
-                                                'qty': request.get('qty')
-                                            }))
+                                            Payload=json.dumps(request))
     return payment_response
 
 
@@ -71,9 +68,7 @@ def ship_it(request, stage):
     lambda_client.invoke(FunctionName=f'{shipping_service_name}:{stage}',
                          InvocationType='Event',
                          LogType='Tail',
-                         Payload=json.dumps({
-                             request
-                         }))
+                         Payload=json.dumps(request))
 
 
 def handle_request(event, context):
@@ -83,9 +78,9 @@ def handle_request(event, context):
         request = json.loads(event.get('body'))
         validate(request)
         reservation_response = reserve(request, stage)
-        print(f'-  reservation response -> ${reservation_response}')
+        logger.debug(f'-  reservation response -> ${reservation_response}')
         rsp = json.loads(reservation_response['Payload'].read())
-        print(f' - rsp [type{type(rsp)}] -> {rsp}')
+        logger.debug(f' - rsp [type{type(rsp)}] -> {rsp}')
 
         reservation_code = rsp.get('statusCode')
         if reservation_code > 299:
@@ -98,17 +93,13 @@ def handle_request(event, context):
                            'payment_id': request.get('payment_id'),
                            'payment_secret': request.get('payment_secret')
                            }, stage)
-
-        rsp = json.load(pmt_rsp['Payload'].read())
-        print(f'payload rsp => {rsp}')
+        logger.debug(f'-  payment response -> ${pmt_rsp}')
+        rsp = json.loads(pmt_rsp['Payload'].read())
+        logger.debug(f'payload rsp => {rsp}')
         if rsp.get('statusCode') > 299:
             return make_response(rsp.get('statusCode'), rsp.get('body'))
 
-        shipping_response = ship_it({'reservation_id': reservation_id}, stage)
-        rsp = json.load(shipping_response['Payload'].read())
-        if rsp.get('statusCode') > 299:
-            return make_response(rsp.get('statusCode'), rsp.get('body'))
-        print(f'shipping rsp => {rsp}')
+        ship_it({'reservation_id': reservation_id}, stage)
         return {
             "statusCode": 200,
             "headers": {
@@ -123,4 +114,4 @@ def handle_request(event, context):
         err_msg = str(ex)
         logger.error(f'{ex.__class__.__name__}: {err_msg}')
         traceback.print_exc()
-        return make_response(500, {"result": f'{ex.__class__.__name__}: {err_msg}'})
+        return make_response(500, {"result@order": f'{ex.__class__.__name__}: {err_msg}'})
