@@ -1,0 +1,156 @@
+{
+  'aws_request_id': '850ec2b9-b51a-4672-ba09-40943dec49e7',
+  'log_group_name': '/aws/lambda/order_service',
+  'log_stream_name': '2019/03/05/[$LATEST]c961bf10e71749fb9a5b8361bfd2296a',
+  'function_name': 'order_service',
+  'memory_limit_in_mb': '128',
+    'function_version': '$LATEST',
+  'invoked_function_arn': 'arn:aws:lambda:eu-west-1:307733074768:function:order_service',
+  'client_context': None,
+  'identity': <bootstrap.CognitoIdentity
+  object
+  at
+  0x7f8f5e5012b0>,
+  '_epoch_deadline_time_in_ms': 1551773217120
+}
+
+{
+  'aws_request_id': 'b7aa80eb-b2b8-4ef6-bcc8-7b96490d6304',
+  'log_group_name': '/aws/lambda/order_service',
+  'log_stream_name': '2019/03/05/[$LATEST]02a69c8716034d2183d83392c0cde8cc',
+  'function_name': 'order_service',
+  'memory_limit_in_mb': '128',
+  'function_version': '$LATEST',
+  'invoked_function_arn': 'arn:aws:lambda:eu-west-1:307733074768:function:order_service',
+  'client_context': None,
+  'identity': <bootstrap.CognitoIdentity
+  object
+  at
+  0x7f04c4267c18>,
+  '_epoch_deadline_time_in_ms': 1551807430208
+}
+
+{
+  'resource': '/order',
+  'path': '/order',
+  'httpMethod': 'POST',
+  'headers': {
+    'accept': '*/*',
+    'accept-encoding': 'gzip, deflate, br',
+    'accept-language': 'en-US,en;q=0.9',
+    'content-type': 'application/json',
+    'cookie': 'pN=9; s_pers=%20s_vnum%3D1554365816349%2526vn%253D1%7C1554365816349%3B%20s_invisit%3Dtrue%7C1551775812387%3B%20s_nr%3D1551774012395-New%7C1559550012395%3B; s_sess=%20s_cc%3Dtrue%3B%20s_sq%3D%3B',
+    'Host': 'xg240aq3he.execute-api.eu-west-1.amazonaws.com',
+    'origin': 'chrome-extension://aejoelaoggembcahagimdiliamlcdmfm',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36',
+    'X-Amzn-Trace-Id': 'Root=1-5c7eb3c2-acf4530c6228b71c0e1b23b8',
+    'x-api-key': '6Vwk7ozXVu1ZxaJVK8b5Y8KpzxUHnnaga4xUAOP5',
+    'X-Forwarded-For': '54.240.197.235',
+    'X-Forwarded-Port': '443',
+    'X-Forwarded-Proto': 'https'
+  },
+  'multiValueHeaders': {
+    'accept': [
+      '*/*'
+    ],
+    'accept-encoding': [
+      'gzip, deflate, br'
+    ],
+    'accept-language': [
+      'en-US,en;q=0.9'
+    ],
+    'content-type': [
+      'application/json'
+    ],
+    'cookie': [
+      'pN=9; s_pers=%20s_vnum%3D1554365816349%2526vn%253D1%7C1554365816349%3B%20s_invisit%3Dtrue%7C1551775812387%3B%20s_nr%3D1551774012395-New%7C1559550012395%3B; s_sess=%20s_cc%3Dtrue%3B%20s_sq%3D%3B'
+    ],
+    'Host': [
+      'xg240aq3he.execute-api.eu-west-1.amazonaws.com'
+    ],
+    'origin': [
+      'chrome-extension://aejoelaoggembcahagimdiliamlcdmfm'
+    ],
+    'User-Agent': [
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36'
+    ],
+    'X-Amzn-Trace-Id': [
+      'Root=1-5c7eb3c2-acf4530c6228b71c0e1b23b8'
+    ],
+    'x-api-key': [
+      '6Vwk7ozXVu1ZxaJVK8b5Y8KpzxUHnnaga4xUAOP5'
+    ],
+    'X-Forwarded-For': [
+      '54.240.197.235'
+    ],
+    'X-Forwarded-Port': [
+      '443'
+    ],
+    'X-Forwarded-Proto': [
+      'https'
+    ]
+  },
+  'queryStringParameters': None,
+  'multiValueQueryStringParameters': None,
+  'pathParameters': None,
+  'stageVariables': None,
+  'requestContext': {
+    'resourceId': '0dg0px',
+    'resourcePath': '/order',
+    'httpMethod': 'POST',
+    'extendedRequestId': 'WFEGXEhHjoEFiIQ=',
+    'requestTime': '05/Mar/2019:17:37:06 +0000',
+    'path': '/dev/order',
+    'accountId': '307733074768',
+    'protocol': 'HTTP/1.1',
+    'stage': 'dev',
+    'domainPrefix': 'xg240aq3he',
+    'requestTimeEpoch': 1551807426310,
+    'requestId': '4b8e1a95-3f6d-11e9-a4a4-19da87ea97c8',
+    'identity': {
+      'cognitoIdentityPoolId': None,
+      'accountId': None,
+      'cognitoIdentityId': None,
+      'caller': None,
+      'sourceIp': '54.240.197.235',
+      'apiKey': '6Vwk7ozXVu1ZxaJVK8b5Y8KpzxUHnnaga4xUAOP5',
+      'accessKey': None,
+      'cognitoAuthenticationType': None,
+      'cognitoAuthenticationProvider': None,
+      'userArn': None,
+      'userAgent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36',
+      'user': None
+    },
+    'domainName': 'xg240aq3he.execute-api.eu-west-1.amazonaws.com',
+    'apiId': 'xg240aq3he'
+  },
+  'body': '{\n \t"user_id":"1234",\n "product_id":"234",\n "qty":"2",\n "amount":"30",\n "currency":"EUR",\n "payment_method":"CARD",\n "payment_id":"1234",\n "payment_secret":"123"\n}',
+  'isBase64Encoded': False
+}
+{
+  'ResponseMetadata': {
+    'RequestId': '8c4c49a8-b642-4822-899a-341f036df041',
+    'HTTPStatusCode': 200,
+    'HTTPHeaders': {
+      'date': 'Tue, 05 Mar 2019 19:57:09 GMT',
+      'content-type': 'application/json',
+      'content-length': '243',
+      'connection': 'keep-alive',
+      'x-amzn-requestid': '8c4c49a8-b642-4822-899a-341f036df041',
+      'x-amz-function-error': 'Unhandled',
+      'x-amzn-remapped-content-length': '0',
+      'x-amz-executed-version': '$LATEST',
+      'x-amz-log-result': 'U1RBUlQgUmVxdWVzdElkOiA4YzRjNDlhOC1iNjQyLTQ4MjItODk5YS0zNDFmMDM2ZGYwNDEgVmVyc2lvbjogJExBVEVTVApbRVJST1JdIEF0dHJpYnV0ZUVycm9yOiAnTGFtYmRhQ29udGV4dCcgb2JqZWN0IGhhcyBubyBhdHRyaWJ1dGUgJ2dldCcNVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOg3CoMKgRmlsZSAiL3Zhci90YXNrL2ludmVudG9yeS9zZXJ2aWNlLnB5IiwgbGluZSA0OCwgaW4gaGFuZGxlX3JlcXVlc3QNwqDCoMKgwqBmdW5jdGlvbl92ZXJzaW9uID0gY29udGV4dC5nZXQoJ2Z1bmN0aW9uX3ZlcnNpb24nKQpFTkQgUmVxdWVzdElkOiA4YzRjNDlhOC1iNjQyLTQ4MjItODk5YS0zNDFmMDM2ZGYwNDEKUkVQT1JUIFJlcXVlc3RJZDogOGM0YzQ5YTgtYjY0Mi00ODIyLTg5OWEtMzQxZjAzNmRmMDQxCUR1cmF0aW9uOiAzNS40OCBtcwlCaWxsZWQgRHVyYXRpb246IDEwMCBtcyAJTWVtb3J5IFNpemU6IDEyOCBNQglNYXggTWVtb3J5IFVzZWQ6IDgxIE1CCQo=',
+      'x-amzn-trace-id': 'root=1-5c7ed494-90976bd5d15f2b86def55df0;sampled=0'
+    },
+    'RetryAttempts': 0
+  },
+  'StatusCode': 200,
+  'FunctionError': 'Unhandled',
+  'LogResult': 'U1RBUlQgUmVxdWVzdElkOiA4YzRjNDlhOC1iNjQyLTQ4MjItODk5YS0zNDFmMDM2ZGYwNDEgVmVyc2lvbjogJExBVEVTVApbRVJST1JdIEF0dHJpYnV0ZUVycm9yOiAnTGFtYmRhQ29udGV4dCcgb2JqZWN0IGhhcyBubyBhdHRyaWJ1dGUgJ2dldCcNVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOg3CoMKgRmlsZSAiL3Zhci90YXNrL2ludmVudG9yeS9zZXJ2aWNlLnB5IiwgbGluZSA0OCwgaW4gaGFuZGxlX3JlcXVlc3QNwqDCoMKgwqBmdW5jdGlvbl92ZXJzaW9uID0gY29udGV4dC5nZXQoJ2Z1bmN0aW9uX3ZlcnNpb24nKQpFTkQgUmVxdWVzdElkOiA4YzRjNDlhOC1iNjQyLTQ4MjItODk5YS0zNDFmMDM2ZGYwNDEKUkVQT1JUIFJlcXVlc3RJZDogOGM0YzQ5YTgtYjY0Mi00ODIyLTg5OWEtMzQxZjAzNmRmMDQxCUR1cmF0aW9uOiAzNS40OCBtcwlCaWxsZWQgRHVyYXRpb246IDEwMCBtcyAJTWVtb3J5IFNpemU6IDEyOCBNQglNYXggTWVtb3J5IFVzZWQ6IDgxIE1CCQo=',
+  'ExecutedVersion': '$LATEST',
+  'Payload': <botocore.response.StreamingBody
+  object
+  at
+  0x7f9eb75f3160>
+}
