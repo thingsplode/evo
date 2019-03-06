@@ -106,7 +106,7 @@ def handle_request(event, context):
             },
             "body": json.dumps({
                 "result": "OK",
-                "reservation_id": reservation_id
+                "reservation_id": reservation_id,
                 "payment_id": pmt_rsp.get("payment_id")
             })
         }
