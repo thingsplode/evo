@@ -30,10 +30,12 @@ def handle_request(event, context):
     try:
         init_logger()
         validate(event.get('body'))
+        # do magical stuff here
     except Exception as ex:
         err_msg = str(ex)
         logger.error(f'generic exception: {err_msg}')
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"result@shipping": f'{ex.__class__.__name__}: {err_msg}'})
-        }
+        raise ex
+        # return {
+        #     "statusCode": 500,
+        #     "body": json.dumps({"result@shipping": f'{ex.__class__.__name__}: {err_msg}'})
+        # }

@@ -7,8 +7,8 @@ from aws_xray_sdk.core import xray_recorder
 from aws_xray_sdk.core import patch
 
 patch(['boto3'])
-
 lambda_client = boto3.client('lambda')
+
 log_level = os.environ.get('LOG_LEVEL', logging.INFO)
 inventory_service_name = os.environ.get('inventory_service', 'inventory_service')
 payment_service_name = os.environ.get('payment_service', 'payment_service')
