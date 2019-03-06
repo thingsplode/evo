@@ -9,17 +9,18 @@ from aws_xray_sdk.core import patch
 patch(['boto3'])
 
 lambda_client = boto3.client('lambda')
+log_level = os.environ.get('LOG_LEVEL', logging.INFO)
 inventory_service_name = os.environ.get('inventory_service', 'inventory_service')
 payment_service_name = os.environ.get('payment_service', 'payment_service')
 shipping_service_name = os.environ.get('shipping_service', 'shipping_service')
-required_fields = set(['product_id', 'qty', 'amount', 'currency', 'payment_method', 'payment_id', 'payment_secret'])
+required_fields = set(['product_id', 'qty', 'amount', 'currency', 'payment_method', 'payment_tool_id', 'payment_secret'])
 
 
 def init_logger():
     global logger
     logger = logging.getLogger()
     logging.getLogger('aws_xray_sdk').setLevel(logging.WARNING)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(log_level)
 
 
 @xray_recorder.capture('make_response')
@@ -53,7 +54,7 @@ def reserve(request, stage):
                                                 }))
     logger.debug(f'-  reservation response -> ${reservation_response}')
     payload = json.loads(reservation_response['Payload'].read())
-    logger.debug(f' - payload [type{type(payload)}] -> {payload}')
+    logger.info(f' - reservation payload [type{type(payload)}] -> {payload}')
     return payload.get('statusCode') if 'statusCode' in payload else 500, payload
 
 
@@ -65,7 +66,7 @@ def payment(request, stage):
                                             Payload=json.dumps(request))
     logger.debug(f'-  payment response -> ${payment_response}')
     payload = json.loads(payment_response['Payload'].read())
-    logger.debug(f'payload rsp => {payload}')
+    logger.info(f'payment payload => {payload}')
     return payload.get('statusCode') if 'statusCode' in payload else 500, payload
 
 
@@ -91,23 +92,23 @@ def handle_request(event, context):
         pmt_code, pmt_rsp = payment({'reservation_id': reservation_id,
                                      'amount': request.get('amount'),
                                      'currency': request.get('currency'),
-                                     'payment_id': request.get('payment_id'),
+                                     'payment_tool_id': request.get('payment_tool_id'),
                                      'payment_secret': request.get('payment_secret')
                                      }, stage)
 
         if pmt_code > 299:
-            return make_response(rsp.get('statusCode'), rsp.get('body'))
+            return make_response(pmt_code, rsp.get('body'))
 
         ship_it({'reservation_id': reservation_id}, stage)
         return {
-            "statusCode": 200,
+            "statusCode": 201,
             "headers": {
                 "x-stage": stage
             },
             "body": json.dumps({
                 "result": "OK",
                 "reservation_id": reservation_id,
-                "payment_id": pmt_rsp.get("payment_id")
+                "payment_id": pmt_rsp.get('body').get('payment_id')
             })
         }
     except Exception as ex:
