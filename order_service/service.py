@@ -51,7 +51,10 @@ def reserve(request, stage):
                                                     'product_id': request.get('product_id'),
                                                     'qty': request.get('qty')
                                                 }))
-    return reservation_response
+    logger.debug(f'-  reservation response -> ${reservation_response}')
+    payload = json.loads(reservation_response['Payload'].read())
+    logger.debug(f' - payload [type{type(payload)}] -> {payload}')
+    return payload.get('statusCode') if 'statusCode' in payload else 500, payload
 
 
 @xray_recorder.capture('payment')
@@ -60,7 +63,10 @@ def payment(request, stage):
                                             InvocationType='RequestResponse',
                                             LogType='Tail',
                                             Payload=json.dumps(request))
-    return payment_response
+    logger.debug(f'-  payment response -> ${payment_response}')
+    payload = json.loads(payment_response['Payload'].read())
+    logger.debug(f'payload rsp => {payload}')
+    return payload.get('statusCode') if 'statusCode' in payload else 500, payload
 
 
 @xray_recorder.capture('shipment')
@@ -77,26 +83,19 @@ def handle_request(event, context):
         stage = event.get('requestContext').get('stage', '$LATEST')
         request = json.loads(event.get('body'))
         validate(request)
-        reservation_response = reserve(request, stage)
-        logger.debug(f'-  reservation response -> ${reservation_response}')
-        rsp = json.loads(reservation_response['Payload'].read())
-        logger.debug(f' - rsp [type{type(rsp)}] -> {rsp}')
-
-        reservation_code = rsp.get('statusCode')
+        reservation_code, rsp = reserve(request, stage)
         if reservation_code > 299:
             return make_response(reservation_code, rsp.get('body'))
 
         reservation_id = rsp.get('body').get('reservation_id')
-        pmt_rsp = payment({'reservation_id': reservation_id,
-                           'amount': request.get('amount'),
-                           'currency': request.get('currency'),
-                           'payment_id': request.get('payment_id'),
-                           'payment_secret': request.get('payment_secret')
-                           }, stage)
-        logger.debug(f'-  payment response -> ${pmt_rsp}')
-        rsp = json.loads(pmt_rsp['Payload'].read())
-        logger.debug(f'payload rsp => {rsp}')
-        if rsp.get('statusCode') > 299:
+        pmt_code, pmt_rsp = payment({'reservation_id': reservation_id,
+                                     'amount': request.get('amount'),
+                                     'currency': request.get('currency'),
+                                     'payment_id': request.get('payment_id'),
+                                     'payment_secret': request.get('payment_secret')
+                                     }, stage)
+
+        if pmt_code > 299:
             return make_response(rsp.get('statusCode'), rsp.get('body'))
 
         ship_it({'reservation_id': reservation_id}, stage)
@@ -108,6 +107,7 @@ def handle_request(event, context):
             "body": json.dumps({
                 "result": "OK",
                 "reservation_id": reservation_id
+                "payment_id": pmt_rsp.get("payment_id")
             })
         }
     except Exception as ex:
